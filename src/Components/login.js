@@ -103,13 +103,7 @@ class Login extends Component {
         } else {
           localStorage.setItem('token', this.state.token);
 
-          this.props.authenticate(this.state.user, this.state.token, () =>
-            this.props.history.push({
-              pathname: '/',
-              state: { isAuthenticated: true }
-            })
-          );
-          this.handleClose();
+          this.props.authenticate(() => this.props.history.push('/'));
         }
       })
       .catch(error => {

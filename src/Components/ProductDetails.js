@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Image, Button, Row, Container } from 'react-bootstrap';
 import axios from 'axios';
-import Login from './login';
 
 const API = 'http://localhost:3000/api';
 
@@ -13,15 +12,16 @@ class ProductDetails extends Component {
       isLoading: true,
       isAuthenticated: props.isAuthenticated
     };
+    this.addToCart = this.addToCart.bind(this);
   }
 
   componentDidMount() {
     this.getProductById(this.state.id);
+    this.getAuthUser();
   }
 
   render() {
     const isLoading = this.state.isLoading;
-
     return (
       <Row className="product-details">
         <Container
@@ -39,28 +39,11 @@ class ProductDetails extends Component {
     );
   }
 
-  getProductById(id) {
-    axios
-      .get(`${API}/product/${id}`)
-      .then(result =>
-        this.setState({
-          product: result.data.product,
-          isLoading: false
-        })
-      )
-      .catch(error =>
-        this.setState({
-          error,
-          isLoading: true
-        })
-      );
-    return this.state.product;
-  }
-
   loadedProduct() {
     const product = this.state.product;
     const tags = product.tags;
     const isAuthenticated = this.state.isAuthenticated;
+    const id = this.state.product._id;
     return (
       <React.Fragment>
         <div className="col-5">
@@ -87,7 +70,9 @@ class ProductDetails extends Component {
               ))}
           </Row>
           {isAuthenticated ? (
-            <Button variant="outline-primary">Anadir al carrito</Button>
+            <Button variant="outline-primary" onClick={this.addToCart}>
+              Anadir al carrito
+            </Button>
           ) : (
             <Row>Inicia sesion para empezar a comprar</Row>
           )}
@@ -95,6 +80,53 @@ class ProductDetails extends Component {
       </React.Fragment>
     );
   }
+
+  addToCart = () => {
+    const itemId = this.state.product._id;
+    const userId = this.state.user._id;
+    axios
+      .post(`${API}/user/${userId}/cart`, { itemId })
+      .then()
+      .catch();
+  };
+
+  getProductById(id) {
+    axios
+      .get(`${API}/product/${id}`)
+      .then(result =>
+        this.setState({
+          product: result.data.product,
+          isLoading: false
+        })
+      )
+      .catch(error =>
+        this.setState({
+          error,
+          isLoading: true
+        })
+      );
+    return this.state.product;
+  }
+
+  getAuthUser() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['x-auth-token'] = token;
+      axios
+        .get(`${API}/user`)
+        .then(result => {
+          this.setState({ user: result.data, isAuthenticated: true });
+          console.log(result);
+        })
+        .catch(error =>
+          this.setState({
+            error,
+            isLoading: false
+          })
+        );
+    }
+  }
+
   toLowercase(str) {
     return str.toLowerCase();
   }

@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import Login from './login';
-import { Route, Redirect } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import axios from 'axios';
 
 import { Navbar, Nav, NavDropdown, Button, Badge } from 'react-bootstrap';
+const API = 'http://localhost:3000/api';
 
 class Navigtion extends Component {
   constructor(props) {
     super(props);
     this.state = { isAuthenticated: this.props.isAuthenticated };
   }
-  componentDidMount() {}
-
-  verifyAuthentication = () => {
-    const token = localStorage.getItem('token');
-    if (token) this.setState({ isAuthenticated: true });
-  };
+  componentDidMount() {
+    this.getAuthUser();
+  }
 
   render() {
     const isAuthenticated = this.state.isAuthenticated;
@@ -49,7 +48,7 @@ class Navigtion extends Component {
         <Navbar.Text>Bienvenido:</Navbar.Text>
         <NavDropdown
           style={{ display: 'inline' }}
-          title="Arturo Madrigal"
+          title={this.state.user.username}
           id="basic-nav-dropdown"
         >
           <NavDropdown.Item href="#action/3.2">
@@ -69,17 +68,17 @@ class Navigtion extends Component {
             Log Out
           </NavDropdown.Item>
         </NavDropdown>
-        <Button variant="outline-secondary">
+        <Button variant="outline-secondary" href="/user/cart">
           <Badge variant="secondary" className="mr-1">
-            9
+            {this.state.user.cart.items.length}
           </Badge>
           Ver Carrito
         </Button>
       </React.Fragment>
     );
   }
-  authenticate = (user, token, redirect) => {
-    this.setState({ user: user, token: token, isAuthenticated: true });
+  authenticate = redirect => {
+    this.setState({ isAuthenticated: true });
     redirect();
   };
 
@@ -92,6 +91,25 @@ class Navigtion extends Component {
         </Button>
       </React.Fragment>
     );
+  }
+
+  getAuthUser() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['x-auth-token'] = token;
+      axios
+        .get(`${API}/user`)
+        .then(result => {
+          this.setState({ user: result.data, isAuthenticated: true });
+          console.log(result);
+        })
+        .catch(error =>
+          this.setState({
+            error,
+            isLoading: false
+          })
+        );
+    }
   }
 }
 

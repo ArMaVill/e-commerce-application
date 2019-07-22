@@ -2,14 +2,14 @@ import React from 'react';
 import Navigation from './Components/Navbar';
 import ProductList from './Components/ProductList';
 import { Container, Row } from 'react-bootstrap';
-import { Route, Redirect } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import ProductDetails from './Components/ProductDetails';
 import Tag from './Components/Tag';
 import Register from './Components/Register';
 import axios from 'axios';
 import About from './Components/About';
 import Contact from './Components/Contact';
-import Auth from './Components/auth';
+import Cart from './Components/Cart';
 
 const API = 'http://localhost:3000/api';
 
@@ -23,9 +23,6 @@ class App extends React.Component {
     this.setState = this.setState.bind(this);
   }
 
-  componentWillMount() {
-    this.verifyAuthentication();
-  }
   render() {
     return (
       <div className="App">
@@ -36,6 +33,7 @@ class App extends React.Component {
               {...props}
               isAuthenticated={this.state.isAuthenticated}
               authenticate={this.authenticate}
+              user={this.state.user}
             />
           )}
         />
@@ -64,18 +62,16 @@ class App extends React.Component {
             />
             <Route
               path="/product/:id"
-              render={props => (
-                <ProductDetails
-                  {...props}
-                  isAuthenticated={this.state.isAuthenticated}
-                />
-              )}
+              render={props => <ProductDetails {...props} />}
             />
             <Route path="/tag/:name" render={props => <Tag {...props} />} />
             <Route path="/about" render={props => <About {...props} />} />
             <Route path="/contact" render={props => <Contact />} />
             <Route path="/register" render={props => <Register {...props} />} />
-            <Route path="/auth" render={props => <Auth {...props} />} />
+            <Route
+              path="/user/cart"
+              render={props => <Cart {...props} user={this.state.user} />}
+            />
           </Row>
         </Container>
       </div>
@@ -84,15 +80,10 @@ class App extends React.Component {
 
   componentDidMount() {
     this.setState({
-      isLoading: false
+      isLoading: true
     });
     this.getProducts();
   }
-
-  verifyAuthentication = () => {
-    const token = localStorage.getItem('token');
-    if (token) this.setState({ isAuthenticated: true });
-  };
 
   getProducts() {
     axios
@@ -111,11 +102,16 @@ class App extends React.Component {
       );
   }
 
-  getProductByTag(name) {
-    let x;
+  getAuthUser() {
+    const token = localStorage.getItem('token');
+
+    axios.defaults.headers.common['x-auth-token'] = token;
     axios
-      .get(`${API}/product/tag/${name}`)
-      .then(result => (x = result.data.products))
+      .get(`${API}/user`)
+      .then(result => {
+        this.setState({ user: result.data, isAuthenticated: true });
+        console.log(result);
+      })
       .catch(error =>
         this.setState({
           error,
