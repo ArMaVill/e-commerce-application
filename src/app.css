@@ -1,0 +1,35 @@
+.content {
+  padding-top: 100px;
+  background-color: rgb(240, 245, 250);
+  justify-content: center;
+}
+.product {
+  background-color: white;
+  position: relative;
+  min-height: 1px;
+  padding: 0px;
+  transition: all 0.2s ease-in-out;
+}
+
+.product:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19) !important;
+  z-index: 999;
+}
+.product-list {
+  display: flex;
+  justify-content: center;
+}
+.product-tag {
+  padding-bottom: 15px;
+  width: 100%;
+}
+
+.tag {
+  margin-top: 15px;
+}
+.product-details {
+  display: flex;
+  width: 80%;
+  justify-content: center;
+}
