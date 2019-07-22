@@ -9,9 +9,12 @@ const API = 'http://localhost:3000/api';
 class Navigtion extends Component {
   constructor(props) {
     super(props);
-    this.state = { isAuthenticated: this.props.isAuthenticated };
+    this.state = {
+      isAuthenticated: this.props.isAuthenticated,
+      user: { username: '', cart: { items: [] } }
+    };
   }
-  componentDidMount() {
+  componentWillMount() {
     this.getAuthUser();
   }
 
@@ -30,7 +33,7 @@ class Navigtion extends Component {
             </Nav>
 
             <Nav className="mr-1">
-              {isAuthenticated ? (
+              {this.state.user ? (
                 this.user()
               ) : (
                 <Route render={props => this.login(props)} />

@@ -31,9 +31,7 @@ class App extends React.Component {
           render={props => (
             <Navigation
               {...props}
-              isAuthenticated={this.state.isAuthenticated}
-              authenticate={this.authenticate}
-              user={this.state.user}
+              user={{ username: 'la concha', cart: { items: [] } }}
             />
           )}
         />

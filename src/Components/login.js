@@ -102,7 +102,7 @@ class Login extends Component {
           });
         } else {
           localStorage.setItem('token', this.state.token);
-
+          localStorage.setItem('usernaem', this.state.user.username);
           this.props.authenticate(() => this.props.history.push('/'));
         }
       })
